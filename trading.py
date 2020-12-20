@@ -40,6 +40,24 @@ def buy_stock(ticker, number_of_shares):
     append_position_dict(ticker, number_of_shares, amount, "buy")
     set_transaction_log(df)
 
+def buy_varified(ticker, number_of_shares):
+    stock_price = get_stock_price(ticker)
+    amount = stock_price * number_of_shares
+    df = get_transaction_log()
+    balance = get_account_balance(df)
+    if amount <= balance:
+        return True
+    else:
+        return False
+
+def sell_varified(ticker, number_of_shars):
+    positions = get_position_dict()
+    if ticker in positions:
+        if positions[ticker][SHARES_NUM] >= number_of_shars:
+            return True
+    else:
+        return False
+
 def sell_stock(ticker, number_of_shares):
     df = get_transaction_log()
     stock_price = get_stock_price(ticker)
@@ -106,21 +124,39 @@ def update_position_values():
 def main():
     #clear_transaction_log(starting ammount)
     clear_transaction_log(1000)
-    buy_stock("aapl", 3)
+
+    if buy_varified("aapl", 3):
+        buy_stock("aapl", 3)
+    else:
+        print("Unable to process transaction")
     print(get_position_dict())
     print()
-    buy_stock("aapl", 2)
+
+    if buy_varified("aapl", 2):
+        buy_stock("aapl", 2)
+    else:
+        print("Unable to process transaction")
     print(get_position_dict())
     print()
+
     buy_stock("f", 15)
     print(get_position_dict())
     print()
-    sell_stock("aapl", 1)
+
+    if sell_varified("aapl", 6):
+        sell_stock("aapl", 6)
+    else:
+        print("Unable to process transaction")
     print(get_position_dict())
     print()
-    sell_stock("f", 10)
+
+    if sell_varified("pnc", 2):
+        sell_stock("pnc", 2)
+    else:
+        print("Unable to process transaction")
     print(get_position_dict())
     print()
+
     update_position_values()
 
     log = get_transaction_log()
