@@ -162,7 +162,5 @@ def main():
     log = get_transaction_log()
     print(log)
 
-
-
 if __name__ == '__main__':
     main()
