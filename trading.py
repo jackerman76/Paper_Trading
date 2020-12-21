@@ -3,9 +3,38 @@ import datetime
 import pandas as pd
 import pickle
 import numpy as np
+import requests
+from bs4 import BeautifulSoup
 
 SHARES_NUM = 0
 AMOUNT = 1
+
+def market_open_today():
+    page=requests.get("https://www.tradinghours.com/open")
+    content=page.content
+    soup=BeautifulSoup(content,"html.parser")
+
+    all=soup.find("p",{"class":"display-4 text-center my-5"}).text
+
+    if "open" in all:
+        return True
+    if "closed" in all:
+        return False
+
+def market_open_now():
+    tz = pytz.timezone('US/Eastern')
+    now = datetime.datetime.now(tz)
+    openTime = datetime.time(hour = 9, minute = 30, second = 0)
+    closeTime = datetime.time(hour = 16, minute = 0, second = 0)
+    if market_open_now():
+        # If before 0930 or after 1600
+        if (now.time() < openTime) or (now.time() > closeTime):
+            return False
+        # If it's a weekend
+        if now.date().weekday() > 4:
+            return False
+
+    return False
 
 def get_stock_price(ticker):
     price = si.get_live_price(ticker)
@@ -161,6 +190,7 @@ def main():
 
     log = get_transaction_log()
     print(log)
+
 
 if __name__ == '__main__':
     main()
