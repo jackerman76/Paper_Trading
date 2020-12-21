@@ -150,6 +150,40 @@ def update_position_values():
     for key in dict:
         dict[key][AMOUNT] = get_stock_price(key)
 
+def create_order_list():
+    pickle_out = open("order_list.pickle","wb")
+    dict = {}
+    pickle.dump(dict, pickle_out)
+    pickle_out.close()
+
+def get_order_list():
+    pickle_in = open("order_list.pickle","rb")
+    dict = pickle.load(pickle_in)
+    return dict
+
+def set_order_list(dict):
+    pickle_out = open("order_list.pickle","wb")
+    pickle.dump(dict, pickle_out)
+    pickle_out.close()
+
+def set_limit_order(ticker, number_of_shares, buy_price):
+    stock_price = get_stock_price(ticker)
+    amount = stock_price * number_of_shares
+    df = get_position_dict()
+    balance = get_account_balance(df)
+    order_list = get_order_list()
+    if balance >= amount:
+        order_list[ticker] = [number_of_shares, buy_price, "limit"]
+    set_order_list(order_list)
+
+def set_stop_order(ticker, number_of_shares, sell_price):
+    order_list = get_order_list()
+    positions = get_position_dict()
+    if ticker in positions and positions[ticker][SHARES_NUM] >= number_of_shares:
+        order_list[ticker] = [number_of_shares, buy_price, "stop"]
+    set_order_list(order_list)
+
+
 def main():
     #clear_transaction_log(starting ammount)
     clear_transaction_log(1000)
